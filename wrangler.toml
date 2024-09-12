@@ -3,3 +3,9 @@ name = "bday-week-demo"
 compatibility_date = "2024-09-09"
 main = "./build/worker/index.js"
 experimental_assets = { directory = "./build/client" }
+
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "birthday-week-demo"
+database_id = "a59dbe74-660a-4f5f-9414-7b1269087767"

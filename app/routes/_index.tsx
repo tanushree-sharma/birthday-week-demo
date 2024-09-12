@@ -1,40 +1,33 @@
-import type { MetaFunction } from "@remix-run/cloudflare";
+import { json } from '@remix-run/cloudflare';
+import type { LoaderFunction } from '@remix-run/cloudflare';
+import { useLoaderData } from '@remix-run/react';
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    {
-      name: "description",
-      content: "Welcome to Remix on Cloudflare Workers!",
-    },
-  ];
+interface Env {
+  DB: D1Database;
+}
+
+export const loader: LoaderFunction = async ({ context }) => {
+  const env = context.env as Env;
+  console.log("querying D1")
+  // Query the D1 database
+  const { results } = await env.DB.prepare(
+    "SELECT * FROM users LIMIT 10"
+  ).all();
+  console.log("querying success")
+
+  return json({ users: results });
 };
 
 export default function Index() {
+  const { users } = useLoaderData<typeof loader>();
+
   return (
-    <div className="font-sans p-4">
-      <h1 className="text-3xl">Welcome to Remix on Cloudflare</h1>
-      <ul className="list-disc mt-4 pl-6 space-y-2">
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/docs"
-            rel="noreferrer"
-          >
-            Remix Docs
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://developers.cloudflare.com/pages/framework-guides/deploy-a-remix-site/"
-            rel="noreferrer"
-          >
-            Cloudflare Pages Docs - Remix guide
-          </a>
-        </li>
+    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
+      <h1>Welcome to Remix with Cloudflare Workers and D1</h1>
+      <ul>
+        {users.map((user: any) => (
+          <li key={user.id}>{user.name} - {user.email}</li>
+        ))}
       </ul>
     </div>
   );
